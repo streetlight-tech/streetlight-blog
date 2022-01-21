@@ -9,10 +9,10 @@ env:
   ACCESS_KEY_ID: ${{ secrets.FEATURE_ACCESS_KEY_ID }}
   SECRET_ACCESS_KEY: ${{ secrets.FEATURE_SECRET_ACCESS_KEY }}
   SAM_TEMPLATE: template.yaml
-  STACK_PREFIX: ${{ secrets.STACK_PREFIX }}
-  PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.STACK_PREFIX }}-PipelineExecutionRole
-  CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::883918470927:role/jackalope-pipeline-CloudFormationExecutionRole-1FI3F581PPDF7
-  ARTIFACTS_BUCKET: ${{ secrets.STACK_PREFIX }}-pipeline-artifacts-${{ secrets.FEATURE_ACCOUNT_ID}}
+  STACK_PREFIX: ${{ secrets.FEATURE_IDENTIFIER_LOWER }}
+  PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_ROLE_PREFIX }}PipelineExecutionRole
+  CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_ROLE_PREFIX }}CloudFormationExecutionRole
+  ARTIFACTS_BUCKET: ${{ secrets.FEATURE_IDENTIFIER_LOWER }}-pipeline-artifacts-${{ secrets.FEATURE_ACCOUNT_ID}}
   REGION: us-east-1
 
 jobs:

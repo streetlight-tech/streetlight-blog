@@ -3,10 +3,16 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   Environment:
     Type: String
+    Default: Dev
     Description: Environment identifier
-  BucketNamePrefix:
+  Identifier:
     Type: String
-    Description: Prefix for bucket name for pipeline artifacts. Bucket name will be ${BucketNamePrefix}-pipeline-artifacts-${AWS::AccountId}.
+    Default: StreetlightBlog
+    Description: Identifier for pipeline roles. Roles will be named ${Identifier}CloudFormationExecutionRole and ${Identifier}PipelineExecutionRole.
+  IdentifierLower:
+    Type: String
+    Default: streetlight-blog
+    Description: Lowercase identifier used for bucket name for pipeline artifacts. Bucket name will be ${IdentifierLower}-pipeline-artifacts-${AWS::AccountId}.
   ExpirationDays:
     Type: String
     Default: 7
@@ -50,6 +56,11 @@ Resources:
   CloudFormationExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName:
+        Fn::Join:
+          - ''
+          - - !Ref Identifier
+            - 'CloudFormationExecutionRole'
       Tags:
         - Key: Environment
           Value: !Ref Environment
@@ -73,6 +84,11 @@ Resources:
   PipelineExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName:
+        Fn::Join:
+          - ''
+          - - !Ref Identifier
+            - 'PipelineExecutionRole'
       Tags:
         - Key: Role
           Value: pipeline-execution-role
@@ -100,6 +116,12 @@ Resources:
   ArtifactsBucket:
     Type: AWS::S3::Bucket
     Properties:
+      BucketName:
+        Fn::Join:
+          - ''
+          - - !Ref IdentifierLower
+            - '-pipeline-artifacts-'
+            - !Ref AWS::AccountId
       Tags:
         - Key: Environment
           Value: !Ref Environment
