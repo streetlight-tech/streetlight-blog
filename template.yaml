@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  streetlight-blog
+
+Parameters:
+  StageName:
+    Type: String
+    Default: Prod
+
+Resources:
+  BlogApi:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      StageName: !Ref StageName
+  BlogFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handler.trigger
+      Runtime: nodejs14.x
+      Events:
+        RenderPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BlogApi
+            Path: /{slug}
+            Method: 'get'
+            RequestParameters:
+              - method.request.path.slug:
+                  Required: false
+
+Outputs:
+  JackalopeBlogApi:
+    Description: "API Gateway endpoint URL for Blog function"
+    Value: !Sub "https://${BlogeApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}"

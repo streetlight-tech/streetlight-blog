@@ -1,0 +1,60 @@
+name: Deploy Feature
+
+on:
+  push:
+    branches:
+      - '[0-9]+**'
+
+env:
+  ACCESS_KEY_ID: ${{ secrets.FEATURE_ACCESS_KEY_ID }}
+  SECRET_ACCESS_KEY: ${{ secrets.FEATURE_SECRET_ACCESS_KEY }}
+  STACK_NAME: ${{ GITHUB_REPOSITORY | sed -e 's/\/.*\///g' }}
+  PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ GITHUB_REPOSITORY | sed -e 's/\/.*\///g' }}-PipelineExecutionRole
+  CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::883918470927:role/jackalope-pipeline-CloudFormationExecutionRole-1FI3F581PPDF7
+  ARTIFACTS_BUCKET: ${{ GITHUB_REPOSITORY | sed -e 's/\/.*\///g' }}-pipeline-artifacts-${{ secrets.FEATURE_ACCOUNT_ID}}
+  REGION: us-east-1
+
+jobs:
+  test:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          npm install
+          npm run lint
+
+  build-and-deploy-feature:
+    # this stage is triggered only for feature branches (feature*),
+    # which will build the stack and deploy to a stack named with branch name.
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - uses: aws-actions/setup-sam@v1
+      - run: sam build --template ${SAM_TEMPLATE}
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ env.FEATURE_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.FEATURE_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+          role-to-assume: ${{ env.PIPELINE_EXECUTION_ROLE }}
+          role-session-name: feature-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Deploy to feature stack in the testing account
+        shell: bash
+        run: |
+          sam deploy --stack-name feature-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
+            --capabilities CAPABILITY_IAM \
+            --region ${REGION} \
+            --s3-bucket ${ARTIFACTS_BUCKET} \
+            --no-fail-on-empty-changeset \
+            --role-arn ${CLOUDFORMATION_EXECUTION_ROLE} \
+            --parameter-overrides StageName=Dev
