@@ -6,8 +6,8 @@ on:
 env:
   ACCESS_KEY_ID: ${{ secrets.FEATURE_ACCESS_KEY_ID }}
   SECRET_ACCESS_KEY: ${{ secrets.FEATURE_SECRET_ACCESS_KEY }}
-  PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_ROLE_PREFIX }}PipelineExecutionRole
-  CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_ROLE_PREFIX }}CloudFormationExecutionRole
+  PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_IDENTIFIER }}PipelineExecutionRole
+  CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_IDENTIFIER }}CloudFormationExecutionRole
   REGION: us-east-1
 
 jobs:

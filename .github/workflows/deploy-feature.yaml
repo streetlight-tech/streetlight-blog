@@ -10,8 +10,8 @@ env:
   SECRET_ACCESS_KEY: ${{ secrets.FEATURE_SECRET_ACCESS_KEY }}
   SAM_TEMPLATE: template.yaml
   STACK_PREFIX: ${{ secrets.FEATURE_IDENTIFIER_LOWER }}
-  PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_ROLE_PREFIX }}PipelineExecutionRole
-  CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_ROLE_PREFIX }}CloudFormationExecutionRole
+  PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_IDENTIFIER }}PipelineExecutionRole
+  CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_IDENTIFIER }}CloudFormationExecutionRole
   ARTIFACTS_BUCKET: ${{ secrets.FEATURE_IDENTIFIER_LOWER }}-pipeline-artifacts-${{ secrets.FEATURE_ACCOUNT_ID}}
   REGION: us-east-1
 
