@@ -1,4 +1,4 @@
-const trigger = async (event) => {
+exports.trigger = async (event) => {
   return {
     headers: {
       "Content-Type": "text.html",
