@@ -16,7 +16,7 @@ Resources:
   BlogFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handler.trigger
+      Handler: dist/handler.trigger
       Runtime: nodejs14.x
       Events:
         RenderPost:
