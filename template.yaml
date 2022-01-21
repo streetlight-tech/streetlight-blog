@@ -7,12 +7,16 @@ Parameters:
   StageName:
     Type: String
     Default: Prod
+  Identifier:
+    Type: String
+    Default: StreetlightBlog
 
 Resources:
   BlogApi:
     Type: 'AWS::Serverless::Api'
     Properties:
       StageName: !Ref StageName
+      Name: !Ref Identifier
   BlogFunction:
     Type: AWS::Serverless::Function
     Properties:
