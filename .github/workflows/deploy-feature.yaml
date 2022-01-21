@@ -8,10 +8,10 @@ on:
 env:
   ACCESS_KEY_ID: ${{ secrets.FEATURE_ACCESS_KEY_ID }}
   SECRET_ACCESS_KEY: ${{ secrets.FEATURE_SECRET_ACCESS_KEY }}
-  STACK_NAME: ${{ GITHUB_REPOSITORY | sed -e 's/\/.*\///g' }}
-  PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ GITHUB_REPOSITORY | sed -e 's/\/.*\///g' }}-PipelineExecutionRole
+  STACK_PREFIX: ${{ secrets.STACK_PREFIX }}
+  PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.STACK_PREFIX }}-PipelineExecutionRole
   CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::883918470927:role/jackalope-pipeline-CloudFormationExecutionRole-1FI3F581PPDF7
-  ARTIFACTS_BUCKET: ${{ GITHUB_REPOSITORY | sed -e 's/\/.*\///g' }}-pipeline-artifacts-${{ secrets.FEATURE_ACCOUNT_ID}}
+  ARTIFACTS_BUCKET: ${{ secrets.STACK_PREFIX }}-pipeline-artifacts-${{ secrets.FEATURE_ACCOUNT_ID}}
   REGION: us-east-1
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
       - name: Deploy to feature stack in the testing account
         shell: bash
         run: |
-          sam deploy --stack-name feature-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
+          sam deploy --stack-name ${{ secrets.STACK_PREFIX }}-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
             --capabilities CAPABILITY_IAM \
             --region ${REGION} \
             --s3-bucket ${ARTIFACTS_BUCKET} \
