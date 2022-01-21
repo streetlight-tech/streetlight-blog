@@ -6,6 +6,7 @@ on:
 env:
   ACCESS_KEY_ID: ${{ secrets.FEATURE_ACCESS_KEY_ID }}
   SECRET_ACCESS_KEY: ${{ secrets.FEATURE_SECRET_ACCESS_KEY }}
+  STACK_PREFIX: ${{ secrets.FEATURE_IDENTIFIER_LOWER }}
   PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_IDENTIFIER }}PipelineExecutionRole
   CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.FEATURE_IDENTIFIER }}CloudFormationExecutionRole
   REGION: us-east-1
@@ -37,6 +38,6 @@ jobs:
           FEATURE_BRANCH_NAME: ${{ github.event.ref }}
         run: |
           sam delete \
-            --stack-name ${{ secrets.STACK_PREFIX }}-$(echo ${FEATURE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
+            --stack-name ${{ env.STACK_PREFIX }}-$(echo ${FEATURE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
             --region ${REGION} \
             --no-prompts
