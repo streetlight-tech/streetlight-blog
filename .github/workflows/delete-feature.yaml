@@ -8,7 +8,6 @@ env:
   SECRET_ACCESS_KEY: ${{ secrets.FEATURE_SECRET_ACCESS_KEY }}
   PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{secrets.FEATURE_ACCOUNT_ID}}:role/${{ secrets.STACK_PREFIX }}-PipelineExecutionRole
   CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::883918470927:role/jackalope-pipeline-CloudFormationExecutionRole-1FI3F581PPDF7
-  ARTIFACTS_BUCKET: ${{ secrets.STACK_PREFIX }}-pipeline-artifacts-${{ secrets.FEATURE_ACCOUNT_ID}}
   REGION: us-east-1
 
 jobs:
