@@ -39,7 +39,7 @@ Resources:
                 Resource: "*"
                 Condition:
                   StringEquals:
-                    aws:ResourceTag/Role: pipeline-execution-role
+                    aws:ResourceTag/Role: !Sub ${IdentifierLower}-pipeline-execution-role
 
   PipelineUserAccessKey:
     Type: AWS::IAM::AccessKey
@@ -51,6 +51,7 @@ Resources:
   PipelineUserSecretKey:
     Type: AWS::SecretsManager::Secret
     Properties:
+      Name: !Sub ${Identifier}PipelineUserSecretKey
       SecretString: !Sub '{"aws_access_key_id": "${PipelineUserAccessKey}", "aws_secret_access_key": "${PipelineUserAccessKey.SecretAccessKey}"}'
 
   CloudFormationExecutionRole:
@@ -73,13 +74,38 @@ Resources:
             Action:
               - 'sts:AssumeRole'
       Policies:
-        - PolicyName: GrantCloudFormationFullAccess
+        - PolicyName: GrantCloudFormationAccess
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action: '*'
-                Resource: '*'
+                Action:
+                  - 'apigateway:POST'
+                Resource: 
+                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/restapis'
+              - Effect: Allow
+                Action:
+                  - 'apigateway:DELETE'
+                  - 'apigateway:GET'
+                  - 'apigateway:PATCH'
+                  - 'apigateway:POST'
+                Resource: 
+                  - !Sub 'arn:aws:apigateway:${AWS::Region}::/restapis/*'
+              - Effect: Allow
+                Action: 'cloudformation:CreateChangeSet'
+                Resource: 
+                  - !Sub 'arn:aws:cloudformation:${AWS::Region}:aws:stack/${IdentifierLower}-*'
+                  - !Sub 'arn:aws:cloudformation:${AWS::Region}:aws:transform/Serverless-2016-10-31'
+              - Effect: Allow
+                Action:
+                  -  'iam:*'
+                Resource:
+                  - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${IdentifierLower}-*'
+              - Effect: Allow
+                Action:
+                  -  'lambda:*'
+                Resource:
+                  - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${IdentifierLower}-*'
 
   PipelineExecutionRole:
     Type: AWS::IAM::Role
@@ -91,7 +117,7 @@ Resources:
             - 'PipelineExecutionRole'
       Tags:
         - Key: Role
-          Value: pipeline-execution-role
+          Value: !Sub ${IdentifierLower}-pipeline-execution-role
         - Key: Environment
           Value: !Ref Environment
       AssumeRolePolicyDocument:
@@ -102,16 +128,6 @@ Resources:
               AWS: !GetAtt PipelineUser.Arn
             Action:
               - 'sts:AssumeRole'
-          - Effect: Allow
-            Principal:
-              # Allow roles with tag Role=aws-sam-pipeline-codebuild-service-role to assume this role.
-              # This is required when CodePipeline is the CI/CD system of choice.
-              AWS: !Ref AWS::AccountId
-            Action:
-              - 'sts:AssumeRole'
-            Condition:
-              StringEquals:
-                aws:PrincipalTag/Role: aws-sam-pipeline-codebuild-service-role
 
   ArtifactsBucket:
     Type: AWS::S3::Bucket
@@ -187,7 +203,7 @@ Resources:
               - "cloudformation:GetTemplate"
               - "cloudformation:GetTemplateSummary"
               - "cloudformation:DescribeStackResource"
-            Resource: '*'
+            Resource: !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${IdentifierLower}-*/*'
           - Effect: Allow
             Action:
               - 's3:DeleteObject'
@@ -198,10 +214,6 @@ Resources:
             Resource:
                 - !Join [ '',[ !GetAtt ArtifactsBucket.Arn, '/*' ] ]
                 - !GetAtt ArtifactsBucket.Arn
-          - Effect: Allow
-            Action:
-              - 'cloudfront:CreateInvalidation'
-            Resource: '*'
       Roles:
         - !Ref PipelineExecutionRole
 
