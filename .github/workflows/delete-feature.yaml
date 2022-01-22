@@ -2,9 +2,6 @@ name: Deploy Feature
 
 on:
   delete:
-push:
-  tags: 
-    - '*'
 
 env:
   ACCESS_KEY_ID: ${{ secrets.FEATURE_ACCESS_KEY_ID }}
