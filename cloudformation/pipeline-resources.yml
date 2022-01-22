@@ -28,6 +28,8 @@ Resources:
       Tags:
         - Key: Environment
           Value: !Ref Environment
+        - Key: Application
+          Value: !Ref Identifier
       Policies:
         - PolicyName: AssumeRoles
           PolicyDocument:
@@ -65,6 +67,8 @@ Resources:
       Tags:
         - Key: Environment
           Value: !Ref Environment
+        - Key: Application
+          Value: !Ref Identifier
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -120,6 +124,8 @@ Resources:
           Value: !Sub ${IdentifierLower}-pipeline-execution-role
         - Key: Environment
           Value: !Ref Environment
+        - Key: Application
+          Value: !Ref Identifier
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -141,6 +147,8 @@ Resources:
       Tags:
         - Key: Environment
           Value: !Ref Environment
+        - Key: Application
+          Value: !Ref Identifier
       LifecycleConfiguration:
         Rules:
           - Id: Expiration
